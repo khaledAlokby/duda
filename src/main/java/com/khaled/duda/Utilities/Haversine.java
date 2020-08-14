@@ -4,6 +4,8 @@ import com.khaled.duda.model.Pupil;
 import com.khaled.duda.model.School;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class Haversine {
 
@@ -30,19 +32,25 @@ public class Haversine {
 
     public static School bestSchool(Pupil pupil, ArrayList<School> schools){
         School bestSchool = null;
-        double maxScore = 0;
+        double maxScore = -1;
+        double gpa = pupil.getGpa();
         for (School school : schools){
-            if (school.isAvailable()){
+            if (school.isAvailable() && gpa >= school.getMinimumGpa()){
                 int numOfFriends = school.numOfFriends(pupil.getId());
                 double dis = haversine(pupil.getLat(),pupil.getLon(),school.getLat(),school.getLon());
                 double score = numOfFriends/ dis;
                 if (score > maxScore){
                     maxScore = score;
                     bestSchool = school;
+                    System.out.println("**** pupil "+ pupil.getId() +" Enrolled into school + "+school.getId()+" ****");
                 }
             }
 
         }
+        if (maxScore == 0)
+            return schools.stream().filter(school -> school.getMinimumGpa() <= gpa).reduce( (sc1,sc2) -> (haversine(pupil.getLat(),pupil.getLon(),sc1.getLat(),sc1.getLon())
+                    < haversine(pupil.getLat(),pupil.getLon(),sc2.getLat(),sc2.getLon())) ? sc1 : sc2).get();
+
         return bestSchool;
     }
 }

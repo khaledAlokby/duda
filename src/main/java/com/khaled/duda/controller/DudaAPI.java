@@ -54,14 +54,21 @@ public class DudaAPI {
 
     @PostMapping("/enroll/{pupilId}")
     public void enroll(@PathVariable(value = "pupilId") Long pupilId) {
-        Pupil pupil = pupilRepository.getOne(pupilId);
+        Pupil pupil = pupilRepository.findById(pupilId).get();
         List<School> schools = schoolRepository.findAll();
+        if (pupil == null || schools == null) {
+            System.out.println("BAKK");
+            return;
+        }
+        System.out.println("Scools number = "+schools.size());
         School bestSchool = Haversine.bestSchool(pupil,(ArrayList)schools);
+        System.out.println("+++++++best school is :"+bestSchool.getId());
         bestSchool.addPupil(pupil);
+        schoolRepository.save(bestSchool);
     }
 
     @GetMapping("/pupil/{id}")
-    public ResponseEntity < Pupil > getEmployeeById(@PathVariable(value = "id") Long pupilId)
+    public ResponseEntity < Pupil > getPupilById(@PathVariable(value = "id") Long pupilId)
             throws ResourceNotFoundException {
         Pupil pupil = pupilRepository.findById(pupilId)
                 .orElseThrow(() -> new ResourceNotFoundException("pupil not found for this id :: " + pupilId));
@@ -78,6 +85,14 @@ public class DudaAPI {
     public List<Long> frinds(@PathVariable(value = "num") long num){
         return pupilRepository.getOne(num).getFriends();
 
+    }
+
+    @GetMapping("/school/{id}")
+    public ResponseEntity < School > getSchoolById(@PathVariable(value = "id") Long id)
+            throws ResourceNotFoundException {
+        School school = schoolRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("pupil not found for this id :: " + id));
+        return ResponseEntity.ok().body(school);
     }
 
 }

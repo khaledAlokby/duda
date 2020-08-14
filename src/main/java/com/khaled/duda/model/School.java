@@ -4,6 +4,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Entity
 @Table(name = "schools")
@@ -14,8 +15,12 @@ public class School {
     private Double lon;
     private Integer minimumGpa;
     private Integer maxNumberOfPupils;
-    private List<Pupil> pupils;
-    private Lock lock;
+
+    public School() {
+    }
+
+    private List<Pupil> pupils = new ArrayList<>();
+    private Lock lock = new ReentrantLock();
     private boolean available;
 
 
@@ -90,17 +95,14 @@ public class School {
 
     public void addPupil(Pupil pupil){
         lock.lock();
-        pupils.add(pupil);
+        if (!pupils.contains(pupil))
+            pupils.add(pupil);
         lock.unlock();
     }
 
     @Column(name = "available", nullable = false)
     public boolean isAvailable() {
-        int count;
-        lock.lock();
-        count = pupils.size();
-        lock.unlock();
-        return count <= maxNumberOfPupils;
+        return pupils.size() <= maxNumberOfPupils;
     }
     public void setAvailable(boolean available) {
         this.available=available;

@@ -36,3 +36,7 @@ build/
 mvnw
 mvnw.cmd
 
+META-INF/
+out/
+src/main/java/META-INF/
+

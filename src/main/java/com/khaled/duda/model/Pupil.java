@@ -8,6 +8,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
 @Entity
@@ -23,6 +24,7 @@ public class Pupil {
     //private Map<String,Integer> grades;
     private List<Grade> grades;
     private List<Long> friends = new ArrayList<>();
+    private double gpa;
 
 
 
@@ -87,7 +89,8 @@ public class Pupil {
     }
 
     public void setFriend(Long friendID) {
-        friends.add(friendID);
+        if (!friends.contains(friendID))
+            friends.add(friendID);
     }
 
     public boolean isFrindOF(long id) {
@@ -96,4 +99,20 @@ public class Pupil {
                 return true;
         return false;
     }
+
+
+    @Column(name = "gpa", nullable = false)
+    public double getGpa() {
+        double count = 0;
+        for (Grade grade : grades){
+            count += grade.getGrade();
+        }
+        return count/grades.size();
+    }
+
+    public void setGpa(double gpa) {
+        this.gpa = gpa;
+    }
+
+
 }
