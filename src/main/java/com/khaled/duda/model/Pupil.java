@@ -1,6 +1,9 @@
 package com.khaled.duda.model;
 
 
+import com.khaled.duda.repository.PupilRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,34 +14,33 @@ import java.util.concurrent.locks.Lock;
 @Table(name = "pupils")
 public class Pupil {
 
+
     private long id;
     private Double lat;
     private Double lon;
 
     @ElementCollection
-    private Map<String,Integer> grades;
-    private List<Long> friends;
+    //private Map<String,Integer> grades;
+    private List<Grade> grades;
+    private List<Long> friends = new ArrayList<>();
 
 
-    public Pupil(Double lat, Double lon, Map<String, Integer> grades) {
+
+    public Pupil(Double lat, Double lon, List<Grade> grades) {
         this.lat = lat;
         this.lon = lon;
         this.grades = grades;
     }
 
-    public Pupil(long id, Double lat, Double lon, Map<String, Integer> grades, List<Long> friends) {
-        this.id = id;
-        this.lat = lat;
-        this.lon = lon;
-        this.grades = grades;
-        this.friends = friends;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     public long getId() {
         return id;
+    }
+
+    public Pupil() {
     }
 
     public void setId(long id) {
@@ -65,11 +67,12 @@ public class Pupil {
 
     @Column(name = "grades", nullable = false)
     @ElementCollection
-    public Map<String, Integer> getGrades() {
+    @OneToMany(targetEntity=Grade.class, fetch=FetchType.EAGER, cascade = {CascadeType.ALL})
+    public List<Grade> getGrades() {
         return grades;
     }
 
-    public void setGrades(Map<String, Integer> grades) {
+    public void setGrades(List<Grade> grades) {
         this.grades = grades;
     }
 
@@ -80,8 +83,6 @@ public class Pupil {
     }
 
     public void setFriends(List<Long> friends) {
-        if (friends == null)
-            friends = new ArrayList<>();
         this.friends = friends;
     }
 
@@ -90,8 +91,8 @@ public class Pupil {
     }
 
     public boolean isFrindOF(long id) {
-        for (Long frindId : friends)
-            if (frindId == id)
+        for (Long friendId : friends)
+            if (friendId == id)
                 return true;
         return false;
     }
